@@ -16,6 +16,7 @@ public class AuthResponse {
     private boolean success;
     private UserInfo user;
     private String error;
+    private String message; // 兼容前端错误处理
 
     @Data
     @Builder
@@ -24,24 +25,27 @@ public class AuthResponse {
     public static class UserInfo {
         private String id;
         private String email;
+        private String name;
         private String learnerId;
     }
 
-    public static AuthResponse success(String id, String email, String learnerId) {
+    public static AuthResponse success(String id, String email, String name, String learnerId) {
         return AuthResponse.builder()
                 .success(true)
                 .user(UserInfo.builder()
                         .id(id)
                         .email(email)
+                        .name(name)
                         .learnerId(learnerId)
                         .build())
                 .build();
     }
 
-    public static AuthResponse error(String message) {
+    public static AuthResponse error(String errorMessage) {
         return AuthResponse.builder()
                 .success(false)
-                .error(message)
+                .error(errorMessage)
+                .message(errorMessage)
                 .build();
     }
 }

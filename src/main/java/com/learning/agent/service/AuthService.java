@@ -58,6 +58,7 @@ public class AuthService {
                 .id(UUID.randomUUID().toString())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .name(request.getName())
                 .learnerId(UUID.randomUUID().toString())
                 .createdAt(now)
                 .updatedAt(now)
@@ -67,7 +68,7 @@ public class AuthService {
 
         log.info("New user registered: {}", newUser.getEmail());
 
-        return AuthResponse.success(newUser.getId(), newUser.getEmail(), newUser.getLearnerId());
+        return AuthResponse.success(newUser.getId(), newUser.getEmail(), newUser.getName(), newUser.getLearnerId());
     }
 
     /**
@@ -95,6 +96,6 @@ public class AuthService {
 
         log.info("User logged in: {}", request.getEmail());
 
-        return AuthResponse.success(user.getId(), user.getEmail(), user.getLearnerId());
+        return AuthResponse.success(user.getId(), user.getEmail(), user.getName(), user.getLearnerId());
     }
 }

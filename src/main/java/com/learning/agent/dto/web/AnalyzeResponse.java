@@ -19,6 +19,7 @@ public class AnalyzeResponse {
     private boolean success;
     private AnalyzeData data;
     private String error;
+    private String message; // 兼容前端错误处理
 
     @Data
     @Builder
@@ -49,10 +50,11 @@ public class AnalyzeResponse {
                 .build();
     }
 
-    public static AnalyzeResponse error(String message) {
+    public static AnalyzeResponse error(String errorMessage) {
         return AnalyzeResponse.builder()
                 .success(false)
-                .error(message)
+                .error(errorMessage)
+                .message(errorMessage)
                 .build();
     }
 }

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SophieSync - 智能学习助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .thinking-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .slide-in-right {
+            animation: slideInRight 0.3s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Markdown styles */
+        .prose h1, .prose h2, .prose h3 { font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        .prose p { margin-bottom: 0.75em; }
+        .prose ul, .prose ol { margin-left: 1.5em; margin-bottom: 0.75em; }
+        .prose li { margin-bottom: 0.25em; }
+        .prose code { background: #f3f4f6; padding: 0.125em 0.25em; border-radius: 0.25em; font-size: 0.875em; }
+        .prose pre { background: #1f2937; color: #e5e7eb; padding: 1em; border-radius: 0.5em; overflow-x: auto; margin-bottom: 1em; }
+        .prose pre code { background: none; padding: 0; }
+        .prose blockquote { border-left: 4px solid #e5e7eb; padding-left: 1em; color: #6b7280; margin-bottom: 1em; }
+        .prose a { color: #2563eb; text-decoration: underline; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+        .prose th, .prose td { border: 1px solid #e5e7eb; padding: 0.5em; text-align: left; }
+        .prose th { background: #f9fafb; }
+    </style>
+</head>
+<body class="bg-white h-screen overflow-hidden">
+
+<div class="flex h-full">
+    <!-- Thinking Sidebar (Right) -->
+    <div id="thinkingSidebar" class="fixed right-0 top-0 bottom-0 w-full md:w-[400px] bg-white shadow-2xl z-50 flex-col hidden">
+        <div class="p-4 flex items-center justify-between border-b border-gray-100">
+            <div class="text-lg font-medium text-gray-900">
+                活动 · <span id="thinkingDuration">0s</span>
+            </div>
+            <button onclick="closeThinkingSidebar()" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+            <div class="text-gray-500 mb-6 font-medium">思考过程</div>
+            <div id="thinkingSteps" class="relative pl-4 border-l-2 border-gray-100 space-y-6 pb-8">
+                <!-- Steps will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Left Sidebar -->
+    <div id="sidebar" class="w-64 bg-gray-50 border-r border-gray-200 flex flex-col hidden md:flex flex-shrink-0">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+                <a href="/" class="text-lg font-bold text-gray-900">SophieSync</a>
+            </div>
+            <button onclick="newChat()" class="w-full flex items-center gap-2 px-3 py-3 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-900 shadow-sm">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                新对话
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto px-2 py-2">
+            <div class="px-2 py-2 text-xs font-medium text-gray-500">历史记录</div>
+            <div id="sessionList">
+                <!-- Session items will be inserted here -->
+            </div>
+        </div>
+
+        <div class="p-3 border-t border-gray-200 space-y-2">
+            <button onclick="openProfileModal()" class="flex items-center gap-3 w-full px-2 py-3 hover:bg-gray-200 rounded-lg transition-colors">
+                <div class="w-8 h-8 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center font-medium text-sm">
+                    S
+                </div>
+                <div class="text-sm font-medium text-gray-700" id="userDisplayName">Sophie</div>
+                <i data-lucide="settings" class="w-4 h-4 ml-auto text-gray-400"></i>
+            </button>
+            <button onclick="logout()" class="flex items-center gap-2 w-full px-2 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="flex-1 flex flex-col relative bg-white h-full">
+        <!-- Mobile Header -->
+        <div class="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white z-10 flex-shrink-0 md:hidden">
+            <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i data-lucide="panel-left" class="w-5 h-5 text-gray-600"></i>
+            </button>
+            <div class="text-sm font-medium text-gray-900">SophieSync</div>
+            <button onclick="newChat()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i data-lucide="plus" class="w-5 h-5 text-gray-600"></i>
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+            <div class="w-full max-w-2xl space-y-8 text-center">
+                <h1 class="text-3xl md:text-4xl font-semibold text-gray-900">今天想学什么？</h1>
+                
+                <!-- Action Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                    <button onclick="document.getElementById('fileInput').click()" class="p-4 border border-gray-200 rounded-xl text-left hover:bg-gray-50 transition-all hover:shadow-sm group bg-white">
+                        <div class="flex items-center justify-between mb-3">
+                            <i data-lucide="upload-cloud" class="w-6 h-6 text-green-600 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">热门</span>
+                        </div>
+                        <div class="font-medium text-gray-900 mb-1">上传</div>
+                        <div class="text-xs text-gray-500">图片、文档</div>
+                    </button>
+
+                    <button onclick="focusInput()" class="p-4 border border-gray-200 rounded-xl text-left hover:bg-gray-50 transition-all hover:shadow-sm group bg-white">
+                        <div class="flex items-center justify-between mb-3">
+                            <i data-lucide="file-text" class="w-6 h-6 text-orange-500 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div class="font-medium text-gray-900 mb-1">粘贴</div>
+                        <div class="text-xs text-gray-500">文本、代码、链接</div>
+                    </button>
+
+                    <button onclick="startVoice()" class="p-4 border border-gray-200 rounded-xl text-left hover:bg-gray-50 transition-all hover:shadow-sm group bg-white">
+                        <div class="flex items-center justify-between mb-3">
+                            <i data-lucide="mic" class="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div class="font-medium text-gray-900 mb-1">语音</div>
+                        <div class="text-xs text-gray-500">语音输入</div>
+                    </button>
+                </div>
+
+                <div class="text-xs text-gray-400 mt-8">
+                    SophieSync 可能也会犯错。请核查重要信息。
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatArea" class="flex-1 overflow-y-auto p-4 md:p-0 hidden">
+            <div id="messageList" class="max-w-3xl mx-auto py-8 space-y-6 pb-32">
+                <!-- Messages will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden max-w-3xl mx-auto px-4">
+            <div class="flex items-center gap-3 px-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm w-fit">
+                <div class="relative w-4 h-4 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black rounded-full opacity-20 animate-ping"></div>
+                    <div class="w-2.5 h-2.5 bg-black rounded-full"></div>
+                </div>
+                <span class="text-sm font-medium text-gray-600">思考中...</span>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent pt-8">
+            <div class="max-w-3xl mx-auto">
+                <!-- Image Preview -->
+                <div id="imagePreview" class="hidden mb-2">
+                    <div class="relative inline-block">
+                        <img id="previewImg" src="" alt="preview" class="max-h-32 rounded-lg border border-gray-200">
+                        <button onclick="clearImage()" class="absolute -top-2 -right-2 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-700">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-end gap-2 bg-gray-100 rounded-2xl p-2">
+                    <button onclick="document.getElementById('fileInput').click()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-lg transition-colors">
+                        <i data-lucide="paperclip" class="w-5 h-5"></i>
+                    </button>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+                    
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="输入消息..." 
+                        rows="1"
+                        class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-gray-900 placeholder-gray-500 max-h-32"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    
+                    <button onclick="sendMessage()" id="sendBtn" class="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl mx-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">定制你的学习助手</h2>
+            <button onclick="closeProfileModal()" class="text-gray-400 hover:text-gray-600">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <form onsubmit="saveProfile(event)" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">当前掌握水平</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" onclick="selectLevel('初学')" data-level="初学" class="level-btn px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        初学
+                    </button>
+                    <button type="button" onclick="selectLevel('中等')" data-level="中等" class="level-btn px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        中等
+                    </button>
+                    <button type="button" onclick="selectLevel('精通')" data-level="精通" class="level-btn px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        精通
+                    </button>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">学习目标</label>
+                <input type="text" id="learningGoal" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" placeholder="例如：提升数学成绩">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">偏好学习方式</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" onclick="selectStyle('讲解+计划')" data-style="讲解+计划" class="style-btn px-3 py-3 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        讲解+计划
+                    </button>
+                    <button type="button" onclick="selectStyle('练习为主')" data-style="练习为主" class="style-btn px-3 py-3 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        练习为主
+                    </button>
+                    <button type="button" onclick="selectStyle('概念解析')" data-style="概念解析" class="style-btn px-3 py-3 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        概念解析
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                保存设置
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // State
+    let messages = [];
+    let selectedImage = null;
+    let profile = JSON.parse(localStorage.getItem('profile')) || {
+        competencyLevel: '中等',
+        learningGoal: '',
+        preferredStyle: '讲解+计划'
+    };
+    let currentThinkingSteps = [];
+
+    // Check authentication
+    document.addEventListener('DOMContentLoaded', function() {
+        const user = localStorage.getItem('user');
+        if (!user) {
+            window.location.href = '/';
+            return;
+        }
+        
+        // Display user name in sidebar
+        try {
+            const userData = JSON.parse(user);
+            const displayName = userData.name || userData.email || 'Sophie';
+            document.getElementById('userDisplayName').textContent = displayName;
+        } catch (e) {
+            console.error('Failed to parse user data', e);
+        }
+        
+        // Load profile UI
+        updateProfileUI();
+        lucide.createIcons();
+    });
+
+    // Message handling
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        
+        if (!text && !selectedImage) return;
+        
+        // Add user message
+        const userMsg = {
+            id: Date.now().toString(),
+            role: 'user',
+            content: text,
+            attachments: selectedImage ? [selectedImage] : []
+        };
+        messages.push(userMsg);
+        renderMessages();
+        
+        // Clear input
+        input.value = '';
+        input.style.height = 'auto';
+        clearImage();
+        
+        // Show chat area, hide empty state
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('chatArea').classList.remove('hidden');
+        
+        // Send to API
+        sendToAPI(text, selectedImage);
+    }
+
+    async function sendToAPI(message, imageData) {
+        document.getElementById('loadingIndicator').classList.remove('hidden');
+        
+        const formData = new FormData();
+        if (message) formData.append('message', message);
+        if (imageData) {
+            // Convert base64 to blob
+            const response = await fetch(imageData);
+            const blob = await response.blob();
+            formData.append('image', blob, 'image.png');
+        }
+        formData.append('profile', JSON.stringify(profile));
+        
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.learnerId) {
+            formData.append('learnerId', user.learnerId);
+        }
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            
+            if (data.success) {
+                // Build assistant message content
+                let content = '';
+                if (data.data.contents && data.data.contents.length > 0) {
+                    content = data.data.contents.join('\n\n---\n\n');
+                }
+                
+                // Add links to created pages
+                if (data.data.createdPages && data.data.createdPages.length > 0) {
+                    content += '\n\n**📄 已创建的 Notion 页面：**\n';
+                    data.data.createdPages.forEach(page => {
+                        if (page.url) {
+                            content += `- [查看页面](${page.url})\n`;
+                        }
+                    });
+                }
+                
+                const assistantMsg = {
+                    id: Date.now().toString(),
+                    role: 'assistant',
+                    content: content || '任务已完成！',
+                    thinkingSteps: data.data.steps || []
+                };
+                messages.push(assistantMsg);
+                currentThinkingSteps = assistantMsg.thinkingSteps;
+                renderMessages();
+            } else {
+                const errorMsg = {
+                    id: Date.now().toString(),
+                    role: 'assistant',
+                    content: `抱歉，处理时出现错误：${data.message || '未知错误'}`
+                };
+                messages.push(errorMsg);
+                renderMessages();
+            }
+        } catch (error) {
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            const errorMsg = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: '网络错误，请稍后重试。'
+            };
+            messages.push(errorMsg);
+            renderMessages();
+        }
+    }
+
+    function renderMessages() {
+        const container = document.getElementById('messageList');
+        container.innerHTML = messages.map(msg => `
+            <div class="flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} fade-in">
+                <div class="max-w-[85%]">
+                    ${msg.thinkingSteps && msg.thinkingSteps.length > 0 ? `
+                        <button onclick="openThinkingSidebar(${messages.indexOf(msg)})" class="mb-2 flex items-center gap-2 text-xs text-gray-500 hover:text-black transition-colors bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300">
+                            <i data-lucide="brain-circuit" class="w-3 h-3"></i>
+                            <span class="font-medium">已思考 ${msg.thinkingSteps.length} 步</span>
+                            <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </button>
+                    ` : ''}
+                    
+                    ${msg.attachments && msg.attachments.length > 0 ? msg.attachments.map(url => `
+                        <img src="${url}" alt="upload" class="max-w-xs rounded-lg mb-2 border border-gray-200">
+                    `).join('') : ''}
+                    
+                    <div class="py-2 px-4 rounded-2xl ${
+                        msg.role === 'user' 
+                            ? 'bg-gray-100 text-gray-900' 
+                            : 'bg-transparent text-gray-900 px-0'
+                    }">
+                        <div class="prose prose-sm max-w-none">${
+                            msg.role === 'assistant' ? marked.parse(msg.content) : escapeHtml(msg.content)
+                        }</div>
+                    </div>
+                    
+                    ${msg.role === 'assistant' ? `
+                        <div class="flex items-center gap-1 mt-2">
+                            <button onclick="copyMessage('${msg.id}')" class="p-1.5 text-gray-400 hover:text-gray-900 transition-colors rounded-md hover:bg-gray-100" title="复制">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                            <button class="p-1.5 text-gray-400 hover:text-gray-900 transition-colors rounded-md hover:bg-gray-100" title="点赞">
+                                <i data-lucide="thumbs-up" class="w-4 h-4"></i>
+                            </button>
+                            <button class="p-1.5 text-gray-400 hover:text-gray-900 transition-colors rounded-md hover:bg-gray-100" title="点踩">
+                                <i data-lucide="thumbs-down" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+        
+        // Scroll to bottom
+        const chatArea = document.getElementById('chatArea');
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function copyMessage(msgId) {
+        const msg = messages.find(m => m.id === msgId);
+        if (msg) {
+            navigator.clipboard.writeText(msg.content);
+        }
+    }
+
+    // File handling
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImage = e.target.result;
+                document.getElementById('previewImg').src = selectedImage;
+                document.getElementById('imagePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearImage() {
+        selectedImage = null;
+        document.getElementById('imagePreview').classList.add('hidden');
+        document.getElementById('fileInput').value = '';
+    }
+
+    // Input handling
+    function handleKeyDown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px';
+    }
+
+    function focusInput() {
+        document.getElementById('messageInput').focus();
+    }
+
+    // Thinking Sidebar
+    function openThinkingSidebar(msgIndex) {
+        const msg = messages[msgIndex];
+        if (!msg || !msg.thinkingSteps) return;
+        
+        currentThinkingSteps = msg.thinkingSteps;
+        renderThinkingSteps();
+        
+        document.getElementById('thinkingSidebar').classList.remove('hidden');
+        document.getElementById('thinkingSidebar').classList.add('flex', 'slide-in-right');
+    }
+
+    function closeThinkingSidebar() {
+        document.getElementById('thinkingSidebar').classList.add('hidden');
+        document.getElementById('thinkingSidebar').classList.remove('flex');
+    }
+
+    function renderThinkingSteps() {
+        const container = document.getElementById('thinkingSteps');
+        container.innerHTML = currentThinkingSteps.map((step, index) => `
+            <div class="relative">
+                <div class="absolute -left-[21px] w-4 h-4 rounded-full border-2 ${
+                    step.status === 'completed' ? 'bg-gray-900 border-gray-900' : 'bg-white border-gray-300'
+                } flex items-center justify-center">
+                    ${step.status === 'completed' ? '<i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>' : ''}
+                </div>
+                <div class="ml-4">
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-sm font-medium text-gray-800">${step.title}</h4>
+                        ${step.duration ? `<span class="text-xs text-gray-400">${step.duration}</span>` : ''}
+                    </div>
+                    ${step.details ? `<p class="text-xs text-gray-500 mt-1 leading-relaxed">${step.details}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    }
+
+    // Chat management
+    function newChat() {
+        messages = [];
+        document.getElementById('chatArea').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+        document.getElementById('messageList').innerHTML = '';
+        // Close mobile sidebar after action
+        if (window.innerWidth < 768) {
+            document.getElementById('sidebar').classList.add('hidden');
+        }
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('inset-0');
+        sidebar.classList.toggle('z-40');
+        sidebar.classList.toggle('w-64');
+    }
+
+    // Profile management
+    function openProfileModal() {
+        updateProfileUI();
+        document.getElementById('profileModal').classList.remove('hidden');
+        document.getElementById('profileModal').classList.add('flex');
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profileModal').classList.add('hidden');
+        document.getElementById('profileModal').classList.remove('flex');
+    }
+
+    function selectLevel(level) {
+        profile.competencyLevel = level;
+        updateProfileUI();
+    }
+
+    function selectStyle(style) {
+        profile.preferredStyle = style;
+        updateProfileUI();
+    }
+
+    function updateProfileUI() {
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            const isSelected = btn.dataset.level === profile.competencyLevel;
+            btn.classList.toggle('bg-black', isSelected);
+            btn.classList.toggle('text-white', isSelected);
+            btn.classList.toggle('border-black', isSelected);
+        });
+        
+        document.querySelectorAll('.style-btn').forEach(btn => {
+            const isSelected = btn.dataset.style === profile.preferredStyle;
+            btn.classList.toggle('bg-black', isSelected);
+            btn.classList.toggle('text-white', isSelected);
+            btn.classList.toggle('border-black', isSelected);
+        });
+        
+        document.getElementById('learningGoal').value = profile.learningGoal || '';
+    }
+
+    function saveProfile(event) {
+        event.preventDefault();
+        profile.learningGoal = document.getElementById('learningGoal').value;
+        localStorage.setItem('profile', JSON.stringify(profile));
+        closeProfileModal();
+    }
+
+    // Voice (placeholder)
+    function startVoice() {
+        alert('语音功能开发中...');
+    }
+
+    // Logout
+    function logout() {
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    }
+</script>
+
+</body>
+</html>

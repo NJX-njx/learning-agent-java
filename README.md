@@ -1,6 +1,6 @@
 # Learning Agent Java Backend
 
-> 基于 Spring Boot 和 LangChain4j 的智能学习助手后端服务，支持 MCP (Model Context Protocol) 集成，实现文档 OCR、知识管理和智能分析功能。
+> 基于 Spring Boot 和 LangChain4j 的智能学习助手全栈应用，支持 MCP (Model Context Protocol) 集成，实现文档 OCR、知识管理和智能分析功能。包含完整的前端界面。
 
 ## 📋 目录
 
@@ -8,6 +8,7 @@
 - [项目结构](#项目结构)
 - [快速开始](#快速开始)
 - [配置说明](#配置说明)
+- [前端说明](#前端说明)
 - [API 文档](#api-文档)
 - [MCP 集成](#mcp-集成)
 - [开发指南](#开发指南)
@@ -18,10 +19,13 @@
 |-----|------|------|
 | Java | 21+ | JDK 运行环境 |
 | Spring Boot | 3.4.1 | Web 框架 |
+| Thymeleaf | 3.1 | 模板引擎 |
 | LangChain4j | 0.36.2 | AI 应用开发框架 |
 | Maven | 3.6+ | 构建工具 |
 | SQLite | 3.x | 轻量级数据库 |
-| Lombok | 1.18.36 | 简化 Java 代码 |
+| TailwindCSS | CDN | 前端样式框架 |
+| Lucide Icons | CDN | 图标库 |
+| Marked.js | CDN | Markdown 渲染 |
 
 ### AI 模型支持
 
@@ -56,8 +60,9 @@ backend-java/
     │   │   ├── LearningAgentApplication.java    # 应用入口
     │   │   │
     │   │   ├── controller/                      # REST 控制器
-    │   │   │   ├── AuthController.java          # 认证接口
-    │   │   │   └── AnalyzeController.java       # 分析接口
+    │   │   │   ├── PageController.java          # 前端页面路由
+    │   │   │   ├── AuthController.java          # 认证接口 (/api)
+    │   │   │   └── AnalyzeController.java       # 分析接口 (/api)
     │   │   │
     │   │   ├── service/                         # 业务服务
     │   │   │   ├── AuthService.java             # 认证服务
@@ -117,7 +122,10 @@ backend-java/
     │   └── resources/
     │       ├── application.properties           # 应用配置
     │       ├── schema.sql                       # 数据库表结构
-    │       └── static/                          # 静态资源
+    │       ├── static/                          # 静态资源
+    │       └── templates/                       # Thymeleaf 模板
+    │           ├── index.html                   # 首页（登录/注册）
+    │           └── chat.html                    # 聊天界面
     │
     └── test/                                    # 测试代码
         ├── java/com/learning/agent/
@@ -205,7 +213,84 @@ mvn clean package
 java -jar target/learning-agent-1.0.0-SNAPSHOT.jar
 ```
 
-服务启动后访问：**http://localhost:3001/api/health**
+服务启动后访问：**http://localhost:3001/**
+
+## 🖥️ 前端说明
+
+本项目包含一套完整的前端界面，基于 Thymeleaf 模板引擎，使用 TailwindCSS 实现响应式设计。
+
+### 页面列表
+
+| 页面 | 路径 | 说明 |
+|------|------|------|
+| 首页（Landing Page） | `/` | 产品介绍、特性展示、用户认证入口 |
+| 聊天界面（Chat） | `/chat.html` | AI 学习助手对话界面 |
+
+### 首页 (`/`)
+
+首页是一个完整的 Landing Page，包含以下模块：
+
+- **Hero Section**：产品标语和主要 CTA 按钮
+- **Features Section**：四大核心功能展示
+  - 📚 智能学习计划
+  - 🔍 AI 文档分析  
+  - 📊 Notion 集成
+  - 🎯 个性化学习路径
+- **Testimonials Section**：用户评价展示
+- **CTA Section**：底部行动召唤区域
+- **认证模态框**：支持登录/注册切换
+
+#### 认证流程
+
+1. 点击首页右上角「开始使用」或 Hero 区域的「开始学习」按钮
+2. 弹出认证模态框，默认显示登录表单
+3. 新用户点击「立即注册」切换到注册表单
+4. 登录/注册成功后自动跳转到聊天界面
+
+### 聊天界面 (`/chat.html`)
+
+聊天界面是核心交互页面，包含：
+
+- **左侧边栏**：
+  - 用户信息显示（用户名）
+  - 新建对话按钮
+  - 历史对话列表
+  - 登出按钮
+- **中间聊天区域**：
+  - 欢迎信息与功能提示
+  - 消息列表（支持 Markdown 渲染）
+  - 输入框 + 图片上传 + 发送按钮
+- **右侧思维面板**（可折叠）：
+  - 实时显示 AI 思考过程
+  - OCR 结果预览
+  - 学习计划展示
+
+#### 功能特点
+
+- **图片上传**：支持拖拽或点击上传，自动预览
+- **Markdown 渲染**：AI 回复支持完整 Markdown 格式
+- **响应式设计**：适配桌面和移动设备
+- **实时反馈**：发送时显示加载动画
+- **Notion 链接**：自动提取并高亮显示生成的 Notion 页面链接
+
+### 前端技术栈
+
+- **Thymeleaf 3.1**：服务端模板引擎
+- **TailwindCSS (CDN)**：原子化 CSS 框架
+- **Lucide Icons (CDN)**：现代图标库
+- **Marked.js (CDN)**：Markdown 解析库
+- **Vanilla JavaScript**：无框架依赖，轻量化实现
+
+### API 端点
+
+前端通过以下 API 端点与后端通信：
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/login` | POST | 用户登录 |
+| `/api/register` | POST | 用户注册 |
+| `/api/analyze` | POST | 发送消息/图片进行分析 |
+| `/api/health` | GET | 健康检查 |
 
 ## ⚙️ 配置说明
 
