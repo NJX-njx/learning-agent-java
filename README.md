@@ -15,17 +15,17 @@
 
 ## 🛠️ 技术栈
 
-| 技术 | 版本 | 说明 |
-|-----|------|------|
-| Java | 21+ | JDK 运行环境 |
-| Spring Boot | 3.4.1 | Web 框架 |
-| Thymeleaf | 3.1 | 模板引擎 |
-| LangChain4j | 0.36.2 | AI 应用开发框架 |
-| Maven | 3.6+ | 构建工具 |
-| SQLite | 3.x | 轻量级数据库 |
-| TailwindCSS | CDN | 前端样式框架 |
-| Lucide Icons | CDN | 图标库 |
-| Marked.js | CDN | Markdown 渲染 |
+| 技术         | 版本   | 说明            |
+| ------------ | ------ | --------------- |
+| Java         | 21+    | JDK 运行环境    |
+| Spring Boot  | 3.4.1  | Web 框架        |
+| Thymeleaf    | 3.1    | 模板引擎        |
+| LangChain4j  | 0.36.2 | AI 应用开发框架 |
+| Maven        | 3.6+   | 构建工具        |
+| SQLite       | 3.x    | 轻量级数据库    |
+| TailwindCSS  | CDN    | 前端样式框架    |
+| Lucide Icons | CDN    | 图标库          |
+| Marked.js    | CDN    | Markdown 渲染   |
 
 ### AI 模型支持
 
@@ -157,8 +157,7 @@ backend-java/
 ### 第一步：克隆项目
 
 ```bash
-git clone <repository-url>
-cd learning-agent/backend-java
+git clone https://github.com/NJX-njx/learning-agent-java.git
 ```
 
 ### 第二步：配置环境变量
@@ -172,6 +171,7 @@ nano .env  # 或使用你喜欢的编辑器
 ```
 
 **必需配置**：
+
 - `WENXIN_API_KEY`: 文心一言 API Key ([获取方式](#1-文心一言-api-配置))
 - `NOTION_MCP_TOKEN`: Notion Integration Secret ([获取方式](#2-notion-mcp-配置))
 - `PADDLEOCR_MCP_SERVER_URL`: PaddleOCR 服务地址 ([获取方式](#3-paddleocr-mcp-配置))
@@ -221,10 +221,10 @@ java -jar target/learning-agent-1.0.0-SNAPSHOT.jar
 
 ### 页面列表
 
-| 页面 | 路径 | 说明 |
-|------|------|------|
-| 首页（Landing Page） | `/` | 产品介绍、特性展示、用户认证入口 |
-| 聊天界面（Chat） | `/chat.html` | AI 学习助手对话界面 |
+| 页面                 | 路径           | 说明                             |
+| -------------------- | -------------- | -------------------------------- |
+| 首页（Landing Page） | `/`          | 产品介绍、特性展示、用户认证入口 |
+| 聊天界面（Chat）     | `/chat.html` | AI 学习助手对话界面              |
 
 ### 首页 (`/`)
 
@@ -233,7 +233,7 @@ java -jar target/learning-agent-1.0.0-SNAPSHOT.jar
 - **Hero Section**：产品标语和主要 CTA 按钮
 - **Features Section**：四大核心功能展示
   - 📚 智能学习计划
-  - 🔍 AI 文档分析  
+  - 🔍 AI 文档分析
   - 📊 Notion 集成
   - 🎯 个性化学习路径
 - **Testimonials Section**：用户评价展示
@@ -285,12 +285,12 @@ java -jar target/learning-agent-1.0.0-SNAPSHOT.jar
 
 前端通过以下 API 端点与后端通信：
 
-| 端点 | 方法 | 说明 |
-|------|------|------|
-| `/api/login` | POST | 用户登录 |
-| `/api/register` | POST | 用户注册 |
-| `/api/analyze` | POST | 发送消息/图片进行分析 |
-| `/api/health` | GET | 健康检查 |
+| 端点              | 方法 | 说明                  |
+| ----------------- | ---- | --------------------- |
+| `/api/login`    | POST | 用户登录              |
+| `/api/register` | POST | 用户注册              |
+| `/api/analyze`  | POST | 发送消息/图片进行分析 |
+| `/api/health`   | GET  | 健康检查              |
 
 ## ⚙️ 配置说明
 
@@ -313,12 +313,12 @@ WENXIN_MODEL=ernie-4.5-turbo-vl
 
 #### 支持的模型
 
-| 模型 | 特性 | 适用场景 |
-|-----|------|---------|
+| 模型                   | 特性                 | 适用场景     |
+| ---------------------- | -------------------- | ------------ |
 | `ernie-4.5-turbo-vl` | 支持图像理解（默认） | 图文混合分析 |
-| `ernie-4.5-8k` | 8K 上下文 | 长文本处理 |
-| `ernie-4.0-turbo-8k` | 高性能 | 通用任务 |
-| `ernie-3.5-8k` | 经济实惠 | 基础任务 |
+| `ernie-4.5-8k`       | 8K 上下文            | 长文本处理   |
+| `ernie-4.0-turbo-8k` | 高性能               | 通用任务     |
+| `ernie-3.5-8k`       | 经济实惠             | 基础任务     |
 
 更多模型详见 [AI Studio 文档](https://aistudio.baidu.com/llm/lmapi)。
 
@@ -344,6 +344,7 @@ NOTION_MCP_VERSION=2022-06-28
 编辑 `mcp-config.jsonc`，根据操作系统调整：
 
 **Windows:**
+
 ```jsonc
 {
   "mcpServers": {
@@ -359,6 +360,7 @@ NOTION_MCP_VERSION=2022-06-28
 ```
 
 **Linux/macOS:**
+
 ```jsonc
 {
   "mcpServers": {
@@ -377,20 +379,20 @@ NOTION_MCP_VERSION=2022-06-28
 
 #### 产线类型
 
-| 产线 | 说明 | 输出格式 |
-|-----|------|---------|
-| `OCR` | 基础文字检测与识别 | 纯文本 |
-| `PP-StructureV3` | 版面分析（推荐） | Markdown（支持表格、公式、图片） |
-| `PaddleOCR-VL` | 多模态大模型文档解析 | 结构化 JSON |
+| 产线               | 说明                 | 输出格式                         |
+| ------------------ | -------------------- | -------------------------------- |
+| `OCR`            | 基础文字检测与识别   | 纯文本                           |
+| `PP-StructureV3` | 版面分析（推荐）     | Markdown（支持表格、公式、图片） |
+| `PaddleOCR-VL`   | 多模态大模型文档解析 | 结构化 JSON                      |
 
 #### 能力来源
 
-| 模式 | 说明 | 配置要求 |
-|-----|------|---------|
-| `aistudio` | PaddleOCR 官网云服务（推荐） | 需要 `SERVER_URL` 和 `ACCESS_TOKEN` |
-| `local` | 本地 Python 库运行 | 需要安装 PaddlePaddle 和 PaddleOCR |
-| `qianfan` | 百度智能云千帆平台 | 需要千帆 API Key |
-| `self_hosted` | 自托管服务 | 需要自建服务地址 |
+| 模式            | 说明                         | 配置要求                                |
+| --------------- | ---------------------------- | --------------------------------------- |
+| `aistudio`    | PaddleOCR 官网云服务（推荐） | 需要 `SERVER_URL` 和 `ACCESS_TOKEN` |
+| `local`       | 本地 Python 库运行           | 需要安装 PaddlePaddle 和 PaddleOCR      |
+| `qianfan`     | 百度智能云千帆平台           | 需要千帆 API Key                        |
+| `self_hosted` | 自托管服务                   | 需要自建服务地址                        |
 
 #### aistudio 模式配置（推荐）
 
@@ -429,6 +431,7 @@ PADDLEOCR_MCP_PPOCR_SOURCE=local
 编辑 `mcp-config.jsonc`：
 
 **Windows:**
+
 ```jsonc
 {
   "mcpServers": {
@@ -448,6 +451,7 @@ PADDLEOCR_MCP_PPOCR_SOURCE=local
 ```
 
 **Linux/macOS:**
+
 ```jsonc
 {
   "mcpServers": {
@@ -510,6 +514,7 @@ Content-Type: application/json
 ```
 
 **响应示例：**
+
 ```json
 {
   "success": true,
@@ -535,6 +540,7 @@ Content-Type: application/json
 ```
 
 **响应示例：**
+
 ```json
 {
   "success": true,
@@ -562,6 +568,7 @@ learnerId: <string>     # 可选，学习者 ID
 ```
 
 **示例（curl）：**
+
 ```bash
 curl -X POST http://localhost:3001/api/analyze \
   -F "image=@/path/to/document.png" \
@@ -570,6 +577,7 @@ curl -X POST http://localhost:3001/api/analyze \
 ```
 
 **响应示例：**
+
 ```json
 {
   "success": true,
@@ -610,19 +618,19 @@ GET /health
 
 #### Notion MCP
 
-| 工具 | 说明 | 参数 |
-|-----|------|------|
+| 工具                   | 说明             | 参数                                  |
+| ---------------------- | ---------------- | ------------------------------------- |
 | `notion_create_page` | 创建 Notion 页面 | `parent_id`, `title`, `content` |
-| `notion_update_page` | 更新页面内容 | `page_id`, `content` |
-| `notion_search` | 搜索页面 | `query` |
-| `notion_get_page` | 获取页面详情 | `page_id` |
+| `notion_update_page` | 更新页面内容     | `page_id`, `content`              |
+| `notion_search`      | 搜索页面         | `query`                             |
+| `notion_get_page`    | 获取页面详情     | `page_id`                           |
 
 #### PaddleOCR MCP
 
-| 工具 | 说明 | 参数 |
-|-----|------|------|
+| 工具                  | 说明          | 参数                              |
+| --------------------- | ------------- | --------------------------------- |
 | `paddleocr_analyze` | 文档 OCR 解析 | `image_url` or `image_base64` |
-| `paddleocr_batch` | 批量解析 | `images[]` |
+| `paddleocr_batch`   | 批量解析      | `images[]`                      |
 
 ### 使用示例
 
@@ -649,11 +657,13 @@ String ocrResult = paddleOcrMcpClient.analyze(imageFile);
 ### 项目导入
 
 **IntelliJ IDEA:**
+
 1. File → Open → 选择 `pom.xml`
 2. 选择「Open as Project」
 3. 等待 Maven 依赖下载完成
 
 **Eclipse:**
+
 1. File → Import → Existing Maven Projects
 2. 选择项目目录
 3. Finish
@@ -678,6 +688,7 @@ logging.level.org.springframework.web=INFO
 SQLite 数据库位于 `data/learning_agent.db`。
 
 **查看数据库：**
+
 ```bash
 # 使用 SQLite CLI
 sqlite3 data/learning_agent.db
@@ -690,6 +701,7 @@ SELECT * FROM users;
 ```
 
 **重置数据库：**
+
 ```bash
 rm data/learning_agent.db
 # 重启应用，将自动重建
@@ -715,6 +727,7 @@ mvn clean package -DskipTests
 **现象：** 日志中出现 `Failed to start MCP server`
 
 **解决方案：**
+
 - 检查 Node.js/Conda 是否正确安装
 - 确认 `mcp-config.jsonc` 中的命令路径正确
 - Windows 用户确保使用 `cmd.exe /c` 前缀
@@ -724,6 +737,7 @@ mvn clean package -DskipTests
 **现象：** `401 Unauthorized` 或 `Invalid API Key`
 
 **解决方案：**
+
 - 确认 `.env` 中的 `WENXIN_API_KEY` 正确
 - 访问 [AI Studio](https://aistudio.baidu.com/account/accessToken) 重新获取 Token
 - 检查 Token 是否过期或被撤销
@@ -733,6 +747,7 @@ mvn clean package -DskipTests
 **现象：** `Connection refused` 或 `Invalid token`
 
 **解决方案：**
+
 - 确认 `PADDLEOCR_MCP_SERVER_URL` 不包含端点路径（如 `/ocr`）
 - 确认 `PADDLEOCR_MCP_AISTUDIO_ACCESS_TOKEN` 正确
 - 在 [AI Studio](https://aistudio.baidu.com/paddleocr/task) 检查服务状态
@@ -742,6 +757,7 @@ mvn clean package -DskipTests
 **现象：** `Maximum upload size exceeded`
 
 **解决方案：**
+
 - 调整 `application.properties` 中的限制：
   ```properties
   spring.servlet.multipart.max-file-size=50MB
