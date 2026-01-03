@@ -9,12 +9,6 @@ target/
 !**/src/test/**/target/
 
 # ---------- IDE ----------
-# IntelliJ IDEA
-.idea/
-*.iws
-*.iml
-*.ipr
-
 # Eclipse
 .apt_generated
 .classpath

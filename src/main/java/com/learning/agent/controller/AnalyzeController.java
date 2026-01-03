@@ -30,8 +30,14 @@ public class AnalyzeController {
             @RequestParam(value = "learnerId", required = false) String learnerId) {
 
         log.info("Analyze request received");
+        log.debug("Parameters - image: {}, message: {}, profile: {}, learnerId: {}",
+                image != null ? image.getOriginalFilename() : "null",
+                message,
+                profile,
+                learnerId);
 
         if ((image == null || image.isEmpty()) && (message == null || message.isEmpty())) {
+            log.warn("Request rejected: No image file or message provided");
             return ResponseEntity.badRequest()
                     .body(AnalyzeResponse.error("No image file or message provided"));
         }

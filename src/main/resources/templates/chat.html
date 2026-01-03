@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SophieSync - 智能学习助手</title>
+    <link rel="icon" href="data:,">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -328,6 +329,9 @@
         messages.push(userMsg);
         renderMessages();
         
+        // Save image data before clearing
+        const imageToSend = selectedImage;
+        
         // Clear input
         input.value = '';
         input.style.height = 'auto';
@@ -337,12 +341,14 @@
         document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('chatArea').classList.remove('hidden');
         
-        // Send to API
-        sendToAPI(text, selectedImage);
+        // Send to API with saved image data
+        sendToAPI(text, imageToSend);
     }
 
     async function sendToAPI(message, imageData) {
         document.getElementById('loadingIndicator').classList.remove('hidden');
+        
+        console.log('Sending to API:', { hasMessage: !!message, hasImage: !!imageData });
         
         const formData = new FormData();
         if (message) formData.append('message', message);
@@ -351,6 +357,7 @@
             const response = await fetch(imageData);
             const blob = await response.blob();
             formData.append('image', blob, 'image.png');
+            console.log('Image blob created, size:', blob.size, 'bytes');
         }
         formData.append('profile', JSON.stringify(profile));
         
