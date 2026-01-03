@@ -1,0 +1,36 @@
+{
+  // MCP 服务器测试配置
+  // 测试环境使用外部环境变量的 token
+  "mcpServers": {
+    // Notion MCP Server - 测试配置
+    "notion": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "${NOTION_MCP_TOKEN}"
+      }
+    },
+    // PaddleOCR MCP Server - 测试配置（可选）
+    "paddleocr": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "conda",
+        "run",
+        "-n",
+        "paddle-agent",
+        "--no-capture-output",
+        "paddleocr_mcp",
+        "--verbose"
+      ],
+      "env": {
+        "PADDLEOCR_MCP_PIPELINE": "${PADDLEOCR_MCP_PIPELINE:PP-StructureV3}",
+        "PADDLEOCR_MCP_PPOCR_SOURCE": "${PADDLEOCR_MCP_PPOCR_SOURCE:aistudio}",
+        "PADDLEOCR_MCP_SERVER_URL": "${PADDLEOCR_MCP_SERVER_URL:}",
+        "PADDLEOCR_MCP_AISTUDIO_ACCESS_TOKEN": "${PADDLEOCR_MCP_AISTUDIO_ACCESS_TOKEN:}",
+        "PADDLEOCR_MCP_TIMEOUT": "${PADDLEOCR_MCP_TIMEOUT:120}",
+        "DISABLE_MODEL_SOURCE_CHECK": "${DISABLE_MODEL_SOURCE_CHECK:False}"
+      }
+    }
+  }
+}

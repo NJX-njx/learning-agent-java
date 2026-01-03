@@ -1,0 +1,38 @@
+{
+  // MCP 服务器配置 - 详细说明参考 README.md
+  "mcpServers": {
+    // Notion MCP Server
+    // Windows 用 cmd.exe /c，Linux/macOS 直接用 npx
+    "notion": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "${NOTION_MCP_TOKEN}"
+      }
+    },
+    // PaddleOCR MCP Server
+    // 安装: conda create -n paddle-agent python=3.10 && pip install paddleocr-mcp
+    // Windows 用 cmd.exe /c，Linux/macOS 直接用 conda
+    "paddleocr": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "conda",
+        "run",
+        "-n",
+        "paddle-agent",
+        "--no-capture-output",
+        "paddleocr_mcp",
+        "--verbose"
+      ],
+      "env": {
+        "PADDLEOCR_MCP_PIPELINE": "${PADDLEOCR_MCP_PIPELINE:PP-StructureV3}",
+        "PADDLEOCR_MCP_PPOCR_SOURCE": "${PADDLEOCR_MCP_PPOCR_SOURCE:aistudio}",
+        "PADDLEOCR_MCP_SERVER_URL": "${PADDLEOCR_MCP_SERVER_URL:}",
+        "PADDLEOCR_MCP_AISTUDIO_ACCESS_TOKEN": "${PADDLEOCR_MCP_AISTUDIO_ACCESS_TOKEN:}",
+        "PADDLEOCR_MCP_TIMEOUT": "${PADDLEOCR_MCP_TIMEOUT:120}",
+        "DISABLE_MODEL_SOURCE_CHECK": "${DISABLE_MODEL_SOURCE_CHECK:False}"
+      }
+    }
+  }
+}
