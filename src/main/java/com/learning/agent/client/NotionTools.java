@@ -101,6 +101,7 @@ public class NotionTools {
         log.info("🔧 [TOOL CALL] notionUpdatePage: pageId={}", pageId);
         
         try {
+            @SuppressWarnings("unchecked")
             Map<String, Object> properties = objectMapper.readValue(propertiesJson, Map.class);
             notionClient.updatePage(pageId, properties);
             return toJson(Map.of("success", true));
@@ -206,6 +207,7 @@ public class NotionTools {
     /**
      * 通过工具名称执行工具
      */
+    @SuppressWarnings("unchecked")
     public String executeTool(String toolName, Map<String, Object> args) {
         return switch (toolName) {
             case "notion_search", "notionSearch" -> notionSearch((String) args.get("query"));

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.learning.agent.config.AppConfigProperties;
 import com.learning.agent.dto.client.NotionCreatedPage;
 import com.learning.agent.dto.client.NotionWritePayload;
 import com.learning.agent.util.McpConfigLoader;
 import com.learning.agent.util.McpConfigLoader.McpServerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -37,12 +37,7 @@ public class NotionMcpClient implements NotionClient {
 
     private final ObjectMapper objectMapper;
     private final McpConfigLoader configLoader;
-
-    @Value("${notion.mcp.token}")
-    private String authToken;
-
-    @Value("${notion.mcp.version:2022-06-28}")
-    private String notionVersion;
+    private final AppConfigProperties appConfig;
 
     private Process mcpProcess;
     private BufferedWriter processWriter;
@@ -51,18 +46,20 @@ public class NotionMcpClient implements NotionClient {
     private final Map<Integer, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
     private volatile boolean connected = false;
 
-    public NotionMcpClient(ObjectMapper objectMapper, McpConfigLoader configLoader) {
+    public NotionMcpClient(ObjectMapper objectMapper, McpConfigLoader configLoader, AppConfigProperties appConfig) {
         this.objectMapper = objectMapper;
         this.configLoader = configLoader;
+        this.appConfig = appConfig;
     }
 
     @PostConstruct
     public void init() {
-        if (authToken == null || authToken.isEmpty()) {
-            log.warn("NOTION_MCP_TOKEN 未设置，Notion 客户端功能将不可用");
+        // 配置已由 AppConfigProperties 加载和验证
+        if (!appConfig.isNotionConfigured()) {
+            log.warn("NOTION_MCP_TOKEN 未配置，Notion 功能将不可用");
             return;
         }
-        if (!authToken.startsWith("ntn_")) {
+        if (!appConfig.getNotionMcpToken().startsWith("ntn_")) {
             log.warn("NOTION_MCP_TOKEN 不以 'ntn_' 开头，可能使用了错误的令牌类型");
         }
     }
@@ -536,6 +533,10 @@ public class NotionMcpClient implements NotionClient {
             return;
         }
 
+        if (!appConfig.isNotionConfigured()) {
+            throw new RuntimeException("Notion MCP token is not configured. Please set NOTION_MCP_TOKEN environment variable.");
+        }
+
         try {
             initializeConnection();
         } catch (Exception e) {
@@ -575,11 +576,11 @@ public class NotionMcpClient implements NotionClient {
             });
         }
         // 使用 Spring 配置的 authToken 作为 NOTION_TOKEN 的 fallback
-        if (authToken != null && !authToken.isEmpty()) {
-            // 如果 NOTION_TOKEN 未设置或为空，使用 authToken
+        if (appConfig.isNotionConfigured()) {
+            // 如果 NOTION_TOKEN 未设置或为空，使用配置的 token
             if (!env.containsKey("NOTION_TOKEN") || env.get("NOTION_TOKEN").isEmpty()) {
-                env.put("NOTION_TOKEN", authToken);
-                log.debug("Using authToken from Spring config for NOTION_TOKEN");
+                env.put("NOTION_TOKEN", appConfig.getNotionMcpToken());
+                log.debug("Using token from AppConfig for NOTION_TOKEN");
             }
         }
 

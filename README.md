@@ -4,28 +4,28 @@
 
 ## 📋 目录
 
-- [技术栈](#技术栈)
-- [项目结构](#项目结构)
-- [快速开始](#快速开始)
-- [配置说明](#配置说明)
-- [前端说明](#前端说明)
-- [API 文档](#api-文档)
-- [MCP 集成](#mcp-集成)
-- [开发指南](#开发指南)
+- [🛠️ 技术栈](#-技术栈)
+- [📁 项目结构](#-项目结构)
+- [🚀 快速开始](#-快速开始)
+- [⚙️ 配置说明](#-配置说明)
+- [🖥️ 前端说明](#-前端说明)
+- [📡 API 文档](#-api-文档)
+- [🔗 MCP 集成](#-mcp-集成)
+- [🔧 开发指南](#-开发指南)
 
 ## 🛠️ 技术栈
 
-| 技术         | 版本   | 说明            |
-| ------------ | ------ | --------------- |
+| 技术           | 版本     | 说明          |
+|--------------|--------|-------------|
 | Java         | 21+    | JDK 运行环境    |
-| Spring Boot  | 3.4.1  | Web 框架        |
+| Spring Boot  | 3.4.5  | Web 框架      |
 | Thymeleaf    | 3.1    | 模板引擎        |
-| LangChain4j  | 0.36.2 | AI 应用开发框架 |
+| LangChain4j  | 0.36.2 | AI 应用开发框架   |
 | Maven        | 3.6+   | 构建工具        |
-| SQLite       | 3.x    | 轻量级数据库    |
-| TailwindCSS  | CDN    | 前端样式框架    |
-| Lucide Icons | CDN    | 图标库          |
-| Marked.js    | CDN    | Markdown 渲染   |
+| SQLite       | 3.x    | 轻量级数据库      |
+| TailwindCSS  | CDN    | 前端样式框架      |
+| Lucide Icons | CDN    | 图标库         |
+| Marked.js    | CDN    | Markdown 渲染 |
 
 ### AI 模型支持
 
@@ -210,87 +210,11 @@ mvn spring-boot:run
 
 # 或构建后运行
 mvn clean package
-java -jar target/learning-agent-1.0.0-SNAPSHOT.jar
+cp target/learning-agent-1.0.0.jar .
+java -jar learning-agent-1.0.0.jar
 ```
 
-服务启动后访问：**http://localhost:3001/**
-
-## 🖥️ 前端说明
-
-本项目包含一套完整的前端界面，基于 Thymeleaf 模板引擎，使用 TailwindCSS 实现响应式设计。
-
-### 页面列表
-
-| 页面                 | 路径           | 说明                             |
-| -------------------- | -------------- | -------------------------------- |
-| 首页（Landing Page） | `/`          | 产品介绍、特性展示、用户认证入口 |
-| 聊天界面（Chat）     | `/chat.html` | AI 学习助手对话界面              |
-
-### 首页 (`/`)
-
-首页是一个完整的 Landing Page，包含以下模块：
-
-- **Hero Section**：产品标语和主要 CTA 按钮
-- **Features Section**：四大核心功能展示
-  - 📚 智能学习计划
-  - 🔍 AI 文档分析
-  - 📊 Notion 集成
-  - 🎯 个性化学习路径
-- **Testimonials Section**：用户评价展示
-- **CTA Section**：底部行动召唤区域
-- **认证模态框**：支持登录/注册切换
-
-#### 认证流程
-
-1. 点击首页右上角「开始使用」或 Hero 区域的「开始学习」按钮
-2. 弹出认证模态框，默认显示登录表单
-3. 新用户点击「立即注册」切换到注册表单
-4. 登录/注册成功后自动跳转到聊天界面
-
-### 聊天界面 (`/chat.html`)
-
-聊天界面是核心交互页面，包含：
-
-- **左侧边栏**：
-  - 用户信息显示（用户名）
-  - 新建对话按钮
-  - 历史对话列表
-  - 登出按钮
-- **中间聊天区域**：
-  - 欢迎信息与功能提示
-  - 消息列表（支持 Markdown 渲染）
-  - 输入框 + 图片上传 + 发送按钮
-- **右侧思维面板**（可折叠）：
-  - 实时显示 AI 思考过程
-  - OCR 结果预览
-  - 学习计划展示
-
-#### 功能特点
-
-- **图片上传**：支持拖拽或点击上传，自动预览
-- **Markdown 渲染**：AI 回复支持完整 Markdown 格式
-- **响应式设计**：适配桌面和移动设备
-- **实时反馈**：发送时显示加载动画
-- **Notion 链接**：自动提取并高亮显示生成的 Notion 页面链接
-
-### 前端技术栈
-
-- **Thymeleaf 3.1**：服务端模板引擎
-- **TailwindCSS (CDN)**：原子化 CSS 框架
-- **Lucide Icons (CDN)**：现代图标库
-- **Marked.js (CDN)**：Markdown 解析库
-- **Vanilla JavaScript**：无框架依赖，轻量化实现
-
-### API 端点
-
-前端通过以下 API 端点与后端通信：
-
-| 端点              | 方法 | 说明                  |
-| ----------------- | ---- | --------------------- |
-| `/api/login`    | POST | 用户登录              |
-| `/api/register` | POST | 用户注册              |
-| `/api/analyze`  | POST | 发送消息/图片进行分析 |
-| `/api/health`   | GET  | 健康检查              |
+服务启动后访问：**http://localhost:8080/**
 
 ## ⚙️ 配置说明
 
@@ -313,12 +237,12 @@ WENXIN_MODEL=ernie-4.5-turbo-vl
 
 #### 支持的模型
 
-| 模型                   | 特性                 | 适用场景     |
-| ---------------------- | -------------------- | ------------ |
+| 模型                   | 特性         | 适用场景   |
+|----------------------|------------|--------|
 | `ernie-4.5-turbo-vl` | 支持图像理解（默认） | 图文混合分析 |
-| `ernie-4.5-8k`       | 8K 上下文            | 长文本处理   |
-| `ernie-4.0-turbo-8k` | 高性能               | 通用任务     |
-| `ernie-3.5-8k`       | 经济实惠             | 基础任务     |
+| `ernie-4.5-8k`       | 8K 上下文     | 长文本处理  |
+| `ernie-4.0-turbo-8k` | 高性能        | 通用任务   |
+| `ernie-3.5-8k`       | 经济实惠       | 基础任务   |
 
 更多模型详见 [AI Studio 文档](https://aistudio.baidu.com/llm/lmapi)。
 
@@ -379,20 +303,20 @@ NOTION_MCP_VERSION=2022-06-28
 
 #### 产线类型
 
-| 产线               | 说明                 | 输出格式                         |
-| ------------------ | -------------------- | -------------------------------- |
-| `OCR`            | 基础文字检测与识别   | 纯文本                           |
-| `PP-StructureV3` | 版面分析（推荐）     | Markdown（支持表格、公式、图片） |
-| `PaddleOCR-VL`   | 多模态大模型文档解析 | 结构化 JSON                      |
+| 产线               | 说明         | 输出格式                 |
+|------------------|------------|----------------------|
+| `OCR`            | 基础文字检测与识别  | 纯文本                  |
+| `PP-StructureV3` | 版面分析（推荐）   | Markdown（支持表格、公式、图片） |
+| `PaddleOCR-VL`   | 多模态大模型文档解析 | 结构化 JSON             |
 
 #### 能力来源
 
-| 模式            | 说明                         | 配置要求                                |
-| --------------- | ---------------------------- | --------------------------------------- |
+| 模式            | 说明                  | 配置要求                             |
+|---------------|---------------------|----------------------------------|
 | `aistudio`    | PaddleOCR 官网云服务（推荐） | 需要 `SERVER_URL` 和 `ACCESS_TOKEN` |
-| `local`       | 本地 Python 库运行           | 需要安装 PaddlePaddle 和 PaddleOCR      |
-| `qianfan`     | 百度智能云千帆平台           | 需要千帆 API Key                        |
-| `self_hosted` | 自托管服务                   | 需要自建服务地址                        |
+| `local`       | 本地 Python 库运行       | 需要安装 PaddlePaddle 和 PaddleOCR    |
+| `qianfan`     | 百度智能云千帆平台           | 需要千帆 API Key                     |
+| `self_hosted` | 自托管服务               | 需要自建服务地址                         |
 
 #### aistudio 模式配置（推荐）
 
@@ -488,15 +412,93 @@ USE_REACT_MODE=false
 # MCP 配置文件路径
 MCP_CONFIG_PATH=mcp-config.jsonc
 
-# 服务端口（默认 3001）
-SERVER_PORT=3001
+# 服务端口（默认 8080）
+SERVER_PORT=8080
 ```
 
 完整配置模板请参考 `.env.example` 文件。
 
+## 🖥️ 前端说明
+
+本项目包含一套完整的前端界面，基于 Thymeleaf 模板引擎，使用 TailwindCSS 实现响应式设计。
+
+### 页面列表
+
+| 页面               | 路径           | 说明               |
+|------------------|--------------|------------------|
+| 首页（Landing Page） | `/`          | 产品介绍、特性展示、用户认证入口 |
+| 聊天界面（Chat）       | `/chat.html` | AI 学习助手对话界面      |
+
+### 首页 (`/`)
+
+首页是一个完整的 Landing Page，包含以下模块：
+
+- **Hero Section**：产品标语和主要 CTA 按钮
+- **Features Section**：四大核心功能展示
+  - 📚 智能学习计划
+  - 🔍 AI 文档分析
+  - 📊 Notion 集成
+  - 🎯 个性化学习路径
+- **Testimonials Section**：用户评价展示
+- **CTA Section**：底部行动召唤区域
+- **认证模态框**：支持登录/注册切换
+
+#### 认证流程
+
+1. 点击首页右上角「开始使用」或 Hero 区域的「开始学习」按钮
+2. 弹出认证模态框，默认显示登录表单
+3. 新用户点击「立即注册」切换到注册表单
+4. 登录/注册成功后自动跳转到聊天界面
+
+### 聊天界面 (`/chat.html`)
+
+聊天界面是核心交互页面，包含：
+
+- **左侧边栏**：
+  - 用户信息显示（用户名）
+  - 新建对话按钮
+  - 历史对话列表
+  - 登出按钮
+- **中间聊天区域**：
+  - 欢迎信息与功能提示
+  - 消息列表（支持 Markdown 渲染）
+  - 输入框 + 图片上传 + 发送按钮
+- **右侧思维面板**（可折叠）：
+  - 实时显示 AI 思考过程
+  - OCR 结果预览
+  - 学习计划展示
+
+#### 功能特点
+
+- **图片上传**：支持拖拽或点击上传，自动预览
+- **Markdown 渲染**：AI 回复支持完整 Markdown 格式
+- **响应式设计**：适配桌面和移动设备
+- **实时反馈**：发送时显示加载动画
+- **Notion 链接**：自动提取并高亮显示生成的 Notion 页面链接
+
+### 前端技术栈
+
+- **Thymeleaf 3.1**：服务端模板引擎
+- **TailwindCSS (CDN)**：原子化 CSS 框架
+- **Lucide Icons (CDN)**：现代图标库
+- **Marked.js (CDN)**：Markdown 解析库
+- **Vanilla JavaScript**：无框架依赖，轻量化实现
+
+### API 端点
+
+前端通过以下 API 端点与后端通信：
+
+| 端点              | 方法   | 说明          |
+|-----------------|------|-------------|
+| `/api/login`    | POST | 用户登录        |
+| `/api/register` | POST | 用户注册        |
+| `/api/analyze`  | POST | 发送消息/图片进行分析 |
+| `/api/health`   | GET  | 健康检查        |
+
+
 ## 📡 API 文档
 
-基础路径：`http://localhost:3001/api`
+基础路径：`http://localhost:8080/api`
 
 ### 认证接口
 
@@ -570,7 +572,7 @@ learnerId: <string>     # 可选，学习者 ID
 **示例（curl）：**
 
 ```bash
-curl -X POST http://localhost:3001/api/analyze \
+curl -X POST http://localhost:8080/api/analyze \
   -F "image=@/path/to/document.png" \
   -F "message=帮我分析这个文档" \
   -F "learnerId=learner_123"
@@ -618,19 +620,19 @@ GET /health
 
 #### Notion MCP
 
-| 工具                   | 说明             | 参数                                  |
-| ---------------------- | ---------------- | ------------------------------------- |
+| 工具                   | 说明           | 参数                              |
+|----------------------|--------------|---------------------------------|
 | `notion_create_page` | 创建 Notion 页面 | `parent_id`, `title`, `content` |
-| `notion_update_page` | 更新页面内容     | `page_id`, `content`              |
-| `notion_search`      | 搜索页面         | `query`                             |
-| `notion_get_page`    | 获取页面详情     | `page_id`                           |
+| `notion_update_page` | 更新页面内容       | `page_id`, `content`            |
+| `notion_search`      | 搜索页面         | `query`                         |
+| `notion_get_page`    | 获取页面详情       | `page_id`                       |
 
 #### PaddleOCR MCP
 
-| 工具                  | 说明          | 参数                              |
-| --------------------- | ------------- | --------------------------------- |
+| 工具                  | 说明        | 参数                            |
+|---------------------|-----------|-------------------------------|
 | `paddleocr_analyze` | 文档 OCR 解析 | `image_url` or `image_base64` |
-| `paddleocr_batch`   | 批量解析      | `images[]`                      |
+| `paddleocr_batch`   | 批量解析      | `images[]`                    |
 
 ### 使用示例
 

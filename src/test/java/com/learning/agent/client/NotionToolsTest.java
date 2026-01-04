@@ -544,6 +544,7 @@ public class NotionToolsTest {
         );
         JsonNode createJson = objectMapper.readTree(createResult);
         String newPageId = createJson.get("id").asText();
+        createdPageIds.add(newPageId); // 记录用于清理
         
         // 3. 追加内容
         log.info("步骤 3: 追加内容");

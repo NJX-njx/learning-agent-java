@@ -6,7 +6,7 @@
 
     <groupId>com.learning</groupId>
     <artifactId>learning-agent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Learning Agent</name>
@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -25,7 +25,12 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
+        <spring-framework.version>6.2.11</spring-framework.version>
+        <logback.version>1.5.19</logback.version>
+        <tomcat.version>10.1.47</tomcat.version>
+        <netty.version>4.1.129.Final</netty.version>
+        <reactor-netty.version>1.3.0-M5</reactor-netty.version>
     </properties>
 
     <dependencies>
@@ -83,10 +88,18 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- 显式指定 Reactor Netty HTTP 版本以修复 CVE-2025-22227 -->
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
+            <version>${reactor-netty.version}</version>
         </dependency>
 
         <!-- Thymeleaf Template Engine -->
@@ -140,6 +153,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
+            <version>6.4.5</version>
         </dependency>
 
 

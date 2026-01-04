@@ -1,5 +1,6 @@
 package com.learning.agent.util;
 
+import com.learning.agent.config.AppConfigProperties;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -8,8 +9,6 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -25,16 +24,12 @@ import java.util.Map;
 @ConditionalOnProperty(name = "api.diagnostic.enabled", havingValue = "true")
 public class ApiDiagnostic implements CommandLineRunner {
 
-    @Value("${wenxin.api.key}")
-    private String apiKey;
-
-    @Value("${wenxin.api.base-url}")
-    private String baseUrl;
-
-    @Value("${wenxin.api.model}")
-    private String modelName;
-
+    private final AppConfigProperties appConfig;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public ApiDiagnostic(AppConfigProperties appConfig) {
+        this.appConfig = appConfig;
+    }
 
     @Override
     public void run(String... args) {
@@ -52,8 +47,9 @@ public class ApiDiagnostic implements CommandLineRunner {
     private void testApiConnection() {
         try {
             log.info("测试配置:");
-            log.info("  Base URL: {}", baseUrl);
-            log.info("  Model: {}", modelName);
+            log.info("  Base URL: {}", appConfig.getWenxinApiBaseUrl());
+            log.info("  Model: {}", appConfig.getWenxinApiModel());
+            String apiKey = appConfig.getWenxinApiKey();
             log.info("  API Key: {}...", apiKey != null && apiKey.length() > 6 ? apiKey.substring(0, 6) : "未设置");
 
             if (apiKey == null || apiKey.isBlank()) {
@@ -68,7 +64,7 @@ public class ApiDiagnostic implements CommandLineRunner {
 
             // 构建简单的测试请求
             Map<String, Object> requestBody = Map.of(
-                    "model", modelName,
+                    "model", appConfig.getWenxinApiModel(),
                     "messages", List.of(
                             Map.of("role", "user", "content", "测试：1+1=?")
                     ),
@@ -78,7 +74,7 @@ public class ApiDiagnostic implements CommandLineRunner {
             );
 
             String requestJson = objectMapper.writeValueAsString(requestBody);
-            String endpoint = baseUrl + "/chat/completions";
+            String endpoint = appConfig.getWenxinApiBaseUrl() + "/chat/completions";
 
             log.info("发送测试请求到: {}", endpoint);
             log.debug("请求体: {}", requestJson);

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.learning.agent.config.AppConfigProperties;
 import com.learning.agent.dto.client.OcrStructuredResult;
 import com.learning.agent.dto.client.OcrTextSpan;
 import com.learning.agent.util.McpConfigLoader;
 import com.learning.agent.util.McpConfigLoader.McpServerConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -30,18 +30,7 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
 
     private final ObjectMapper objectMapper;
     private final McpConfigLoader configLoader;
-
-    @Value("${paddleocr.mcp.server:paddleocr}")
-    private String serverName;
-
-    @Value("${paddleocr.request.timeout-ms:120000}")
-    private int baseTimeout;
-
-    @Value("${paddleocr.request.retries:3}")
-    private int maxAttempts;
-
-    @Value("${paddleocr.mcp.init-timeout-sec:120}")
-    private int initTimeoutSeconds;
+    private final AppConfigProperties appConfig;
 
     private Process mcpProcess;
     private BufferedWriter processWriter;
@@ -51,9 +40,10 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
     private final Map<Integer, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
     private volatile boolean connected = false;
 
-    public PaddleOcrMcpClient(ObjectMapper objectMapper, McpConfigLoader configLoader) {
+    public PaddleOcrMcpClient(ObjectMapper objectMapper, McpConfigLoader configLoader, AppConfigProperties appConfig) {
         this.objectMapper = objectMapper;
         this.configLoader = configLoader;
+        this.appConfig = appConfig;
     }
 
     @Override
@@ -85,15 +75,15 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
     private JsonNode callToolWithRetry(String name, Map<String, Object> args) throws Exception {
         Exception lastError = null;
 
-        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-            int timeout = baseTimeout * attempt;
+        for (int attempt = 1; attempt <= appConfig.getPaddleOcrRequestRetries(); attempt++) {
+            int timeout = appConfig.getPaddleOcrRequestTimeoutMs() * attempt;
             try {
                 return callTool(name, args, timeout);
             } catch (Exception e) {
                 lastError = e;
                 log.warn("PaddleOcrMcpClient.callTool attempt {} failed: {}", attempt, e.getMessage());
 
-                if (attempt < maxAttempts) {
+                if (attempt < appConfig.getPaddleOcrRequestRetries()) {
                     // 指数退避等待
                     Thread.sleep(1000L * attempt);
                 }
@@ -103,7 +93,7 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
         if (lastError != null) {
             throw lastError;
         }
-        throw new RuntimeException("MCP connection failed after " + maxAttempts + " attempts");
+        throw new RuntimeException("MCP connection failed after " + appConfig.getPaddleOcrRequestRetries() + " attempts");
     }
 
     private synchronized JsonNode callTool(String name, Map<String, Object> args, int timeoutMs) throws Exception {
@@ -166,7 +156,7 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
     }
 
     private void initializeConnection() throws Exception {
-        McpServerConfig config = configLoader.getServerConfig(serverName);
+        McpServerConfig config = configLoader.getServerConfig(appConfig.getPaddleOcrMcpServer());
 
         if (config.command() == null) {
             throw new RuntimeException("PaddleOCR MCP config must be command-based (stdio)");
@@ -270,14 +260,14 @@ public class PaddleOcrMcpClient implements PaddleOcrClient {
         processWriter.newLine();
         processWriter.flush();
 
-        log.info("Waiting for initialize response (timeout: {}s)...", initTimeoutSeconds);
+        log.info("Waiting for initialize response (timeout: {}s)...", appConfig.getPaddleOcrMcpInitTimeoutSec());
         try {
-            future.get(initTimeoutSeconds, TimeUnit.SECONDS);
+            future.get(appConfig.getPaddleOcrMcpInitTimeoutSec(), TimeUnit.SECONDS);
             log.info("Initialize response received");
         } catch (Exception e) {
             boolean isAlive = mcpProcess != null && mcpProcess.isAlive();
             log.error("Initialize failed - Process alive: {}, Error: {}", isAlive, e.getMessage());
-            throw new RuntimeException("PaddleOCR MCP initialize timeout (" + initTimeoutSeconds + "s). Process alive: " + isAlive +
+            throw new RuntimeException("PaddleOCR MCP initialize timeout (" + appConfig.getPaddleOcrMcpInitTimeoutSec() + "s). Process alive: " + isAlive +
                     ". Check logs for stderr output. Ensure paddleocr_mcp is installed and configured correctly.", e);
         }
         pendingRequests.remove(requestId);
